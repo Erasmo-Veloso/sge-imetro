@@ -10,6 +10,7 @@ import { SelectionProcessesPage } from '@/features/selection-processes/selection
 import { EnrollmentsPage } from '@/features/enrollments/enrollments-page';
 import { ReviewEnrollmentsPage } from '@/features/enrollments/review-page';
 import { RegistrationsPage } from '@/features/registrations/registrations-page';
+import { ClassesPage } from '@/features/classes/classes-page';
 import { AssessmentPlanPage } from '@/features/assessment/assessment-plan-page';
 import { GradesPage } from '@/features/grades/grades-page';
 import { AttendancePage } from '@/features/attendance/attendance-page';
@@ -61,6 +62,16 @@ export function App() {
       />
 
       {/* Sprint 2 — Inscrição & Matrícula */}
+      <Route
+        path="/classes"
+        element={
+          <RequireRole roles={['ADMIN', 'TEACHER']}>
+            <AppLayout>
+              <ClassesPage />
+            </AppLayout>
+          </RequireRole>
+        }
+      />
       <Route
         path="/selection-processes"
         element={

@@ -450,6 +450,74 @@ export function useMyRegistrations() {
   });
 }
 
+// ── Classes ────────────────────────────────────────
+export interface ClassDTO {
+  id: string;
+  disciplineId: string;
+  teacherId: string | null;
+  year: number;
+  period: 'FIRST' | 'SECOND';
+  capacity: number;
+  schedule: string | null;
+  room: string | null;
+  createdAt: string;
+  discipline?: { id: string; name: string; code: string };
+  teacher?: { id: string; name: string; email: string } | null;
+  _count?: { registrations: number };
+}
+
+export interface ClassInput {
+  disciplineId: string;
+  teacherId?: string;
+  year: number;
+  period?: string;
+  capacity?: number;
+  schedule?: string;
+  room?: string;
+}
+
+export async function listClasses(params: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  year?: number;
+}) {
+  const res = await api.get<PageResult<ClassDTO>>('/classes', { params });
+  return res.data;
+}
+
+export async function getClass(id: string): Promise<ClassDTO> {
+  const res = await api.get<ClassDTO>(`/classes/${id}`);
+  return res.data;
+}
+
+export async function createClass(input: ClassInput): Promise<ClassDTO> {
+  const res = await api.post<ClassDTO>('/classes', input);
+  return res.data;
+}
+
+export async function updateClass(id: string, input: Partial<ClassInput>): Promise<ClassDTO> {
+  const res = await api.patch<ClassDTO>(`/classes/${id}`, input);
+  return res.data;
+}
+
+export async function deleteClass(id: string): Promise<void> {
+  await api.delete(`/classes/${id}`);
+}
+
+export function useClasses(params: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  year?: number;
+}) {
+  return useQuery({
+    queryKey: ['classes', params],
+    queryFn: () => listClasses(params),
+    placeholderData: (prev) => prev,
+  });
+}
+
 // ── Assessment Plans ───────────────────────────────
 export interface AssessmentPlanDTO {
   id: string;

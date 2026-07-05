@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
+import { AuthModule } from '../auth/auth.module';
 import { AssessmentPlansController } from './assessment-plans.controller';
 import { AssessmentPlansService } from './assessment-plans.service';
 
 @Module({
+  imports: [AuthModule],
   controllers: [AssessmentPlansController],
   providers: [AssessmentPlansService],
   exports: [AssessmentPlansService],

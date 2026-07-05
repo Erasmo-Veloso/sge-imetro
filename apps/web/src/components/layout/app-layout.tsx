@@ -37,6 +37,7 @@ const NAV: NavItem[] = [
     icon: ClipboardList,
     roles: ['ADMIN'],
   },
+  { label: 'Turmas', to: '/classes', icon: GraduationCap, roles: ['ADMIN', 'TEACHER'] },
   { label: 'Inscrições', to: '/enrollments', icon: FileText, roles: ['STUDENT'] },
   { label: 'Rever inscrições', to: '/review-enrollments', icon: FileCheck, roles: ['ADMIN'] },
   {
