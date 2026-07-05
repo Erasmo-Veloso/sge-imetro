@@ -47,5 +47,5 @@ apps/api/prisma/*.db
 apps/api/prisma/migrations/dev.db*
 
 # uploads (dev)
-storage
-uploads
+/storage
+/uploads
