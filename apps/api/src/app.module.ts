@@ -12,6 +12,9 @@ import { DisciplinesModule } from './disciplines/disciplines.module';
 import { SelectionProcessesModule } from './selection-processes/selection-processes.module';
 import { EnrollmentsModule } from './enrollments/enrollments.module';
 import { RegistrationsModule } from './registrations/registrations.module';
+import { AssessmentPlansModule } from './assessment-plans/assessment-plans.module';
+import { GradesModule } from './grades/grades.module';
+import { AttendanceModule } from './attendance/attendance.module';
 import { validateEnv } from './config/env';
 
 @Module({
@@ -31,6 +34,9 @@ import { validateEnv } from './config/env';
     SelectionProcessesModule,
     EnrollmentsModule,
     RegistrationsModule,
+    AssessmentPlansModule,
+    GradesModule,
+    AttendanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

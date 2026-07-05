@@ -37,6 +37,39 @@ enum SemesterPeriod {
   SECOND
 }
 
+enum AssessmentType {
+  FREQUENCY
+  TEST
+  EXAM
+  PROJECT
+  HOMEWORK
+}
+
+enum RoundingRule {
+  FLOOR
+  CEIL
+  ROUND
+  NONE
+}
+
+enum AttendanceMethod {
+  MANUAL
+  QR
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  JUSTIFIED
+  LATE
+}
+
+enum ClassSessionStatus {
+  OPEN
+  CLOSED
+  CANCELLED
+}
+
 // ─────────────────────────────────────────────
 // Identity & Auth
 // ─────────────────────────────────────────────
@@ -62,6 +95,7 @@ model User {
   enrollments      Enrollment[]      @relation("EnrollmentOwner")
   reviewedEnrollments Enrollment[] @relation("EnrollmentReviewer")
   registrations    Registration[]
+  gradesGiven      Grade[]           @relation("GradeTeacher")
   auditDocuments    AuditDocument[]
   payments         Payment[]
 
@@ -159,6 +193,8 @@ model Class {
   discipline Discipline @relation(fields: [disciplineId], references: [id], onDelete: Cascade)
   teacher    User?       @relation(fields: [teacherId], references: [id], onDelete: SetNull)
   registrations Registration[]
+  assessmentPlan AssessmentPlan?
+  sessions   ClassSession[]
 
   @@unique([disciplineId, year, period])
   @@index([disciplineId])
@@ -282,12 +318,112 @@ model Registration {
   student   User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
   class     Class      @relation(fields: [classId], references: [id], onDelete: Cascade)
   enrollment Enrollment? @relation(fields: [enrollmentId], references: [id], onDelete: SetNull)
+  grades      Grade[]
+  attendances Attendance[]
 
   @@unique([studentId, classId, academicYear])
   @@index([studentId])
   @@index([classId])
   @@index([academicYear])
   @@map("registrations")
+}
+
+// ─────────────────────────────────────────────
+// Avaliação & Notas (RF04)
+// ─────────────────────────────────────────────
+
+model AssessmentPlan {
+  id             String        @id @default(cuid())
+  classId        String        @unique
+  scaleMax       Float         @default(20)
+  passingScore   Float         @default(10)
+  minAttendancePct Float       @default(70)
+  roundingRule   RoundingRule  @default(ROUND)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  class  Class           @relation(fields: [classId], references: [id], onDelete: Cascade)
+  items  AssessmentItem[]
+
+  @@map("assessment_plans")
+}
+
+model AssessmentItem {
+  id              String         @id @default(cuid())
+  planId          String
+  type            AssessmentType
+  name            String
+  weight          Float           @default(0)
+  maxScore        Float           @default(20)
+  order           Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  plan   AssessmentPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  grades Grade[]
+
+  @@index([planId])
+  @@index([order])
+  @@map("assessment_items")
+}
+
+model Grade {
+  id              String   @id @default(cuid())
+  registrationId  String
+  assessmentItemId String
+  score           Float
+  note            String?
+  recordedById     String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  registration  Registration   @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  assessmentItem AssessmentItem @relation(fields: [assessmentItemId], references: [id], onDelete: Cascade)
+  recordedBy     User           @relation("GradeTeacher", fields: [recordedById], references: [id], onDelete: SetNull)
+
+  @@unique([registrationId, assessmentItemId])
+  @@index([registrationId])
+  @@index([assessmentItemId])
+  @@map("grades")
+}
+
+// ─────────────────────────────────────────────
+// Presença & Sessões (RF05)
+// ─────────────────────────────────────────────
+
+model ClassSession {
+  id        String            @id @default(cuid())
+  classId   String
+  date      DateTime          @default(now())
+  qrToken   String?           @unique
+  qrExpiresAt DateTime?
+  status    ClassSessionStatus @default(OPEN)
+  closedAt  DateTime?
+  createdAt DateTime          @default(now())
+
+  class       Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  attendances Attendance[]
+
+  @@index([classId])
+  @@index([date])
+  @@map("class_sessions")
+}
+
+model Attendance {
+  id             String           @id @default(cuid())
+  registrationId String
+  classSessionId String
+  status         AttendanceStatus @default(ABSENT)
+  method         AttendanceMethod @default(MANUAL)
+  markedAt       DateTime         @default(now())
+
+  registration  Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  classSession  ClassSession  @relation(fields: [classSessionId], references: [id], onDelete: Cascade)
+
+  @@unique([registrationId, classSessionId])
+  @@index([registrationId])
+  @@index([classSessionId])
+  @@map("attendances")
 }
 
 // ─────────────────────────────────────────────

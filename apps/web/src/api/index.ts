@@ -449,3 +449,202 @@ export function useMyRegistrations() {
     queryFn: () => myRegistrations(),
   });
 }
+
+// ── Assessment Plans ───────────────────────────────
+export interface AssessmentPlanDTO {
+  id: string;
+  classId: string;
+  scaleMax: number;
+  passingScore: number;
+  minAttendancePct: number;
+  roundingRule: 'FLOOR' | 'CEIL' | 'ROUND' | 'NONE';
+  items: AssessmentItemDTO[];
+  createdAt: string;
+}
+
+export interface AssessmentItemDTO {
+  id: string;
+  planId: string;
+  type: 'FREQUENCY' | 'TEST' | 'EXAM' | 'PROJECT' | 'HOMEWORK';
+  name: string;
+  weight: number;
+  maxScore: number;
+  order: number;
+}
+
+export async function getAssessmentPlan(classId: string): Promise<AssessmentPlanDTO> {
+  const res = await api.get<AssessmentPlanDTO>(`/classes/${classId}/assessment-plan`);
+  return res.data;
+}
+
+export async function createAssessmentPlan(
+  classId: string,
+  input: {
+    scaleMax?: number;
+    passingScore?: number;
+    minAttendancePct?: number;
+    roundingRule?: string;
+    items: { type: string; name: string; weight: number; maxScore: number; order?: number }[];
+  },
+): Promise<AssessmentPlanDTO> {
+  const res = await api.post<AssessmentPlanDTO>(`/classes/${classId}/assessment-plan`, input);
+  return res.data;
+}
+
+export async function updateAssessmentPlan(
+  id: string,
+  input: Partial<{
+    scaleMax: number;
+    passingScore: number;
+    minAttendancePct: number;
+    roundingRule: string;
+    items: { type: string; name: string; weight: number; maxScore: number; order?: number }[];
+  }>,
+): Promise<AssessmentPlanDTO> {
+  const res = await api.patch<AssessmentPlanDTO>(`/assessment-plans/${id}`, input);
+  return res.data;
+}
+
+export function useAssessmentPlan(classId: string) {
+  return useQuery({
+    queryKey: ['assessment-plan', classId],
+    queryFn: () => getAssessmentPlan(classId),
+    enabled: !!classId,
+  });
+}
+
+// ── Grades ─────────────────────────────────────────
+export interface GradeDTO {
+  id: string;
+  registrationId: string;
+  assessmentItemId: string;
+  score: number;
+  note: string | null;
+  recordedById: string;
+  createdAt: string;
+  assessmentItem?: AssessmentItemDTO;
+  registration?: RegistrationDTO;
+}
+
+export interface AverageDTO {
+  registrationId: string;
+  average: number;
+  passed: boolean;
+  passingScore: number;
+  scaleMax: number;
+  totalWeight: number;
+}
+
+export async function bulkRecordGrades(
+  classId: string,
+  sessionId: string,
+  grades: { registrationId: string; assessmentItemId: string; score: number; note?: string }[],
+): Promise<GradeDTO[]> {
+  const res = await api.post<GradeDTO[]>(`/classes/${classId}/sessions/${sessionId}/grades`, {
+    grades,
+  });
+  return res.data;
+}
+
+export async function getGradesByRegistration(registrationId: string): Promise<GradeDTO[]> {
+  const res = await api.get<GradeDTO[]>(`/registrations/${registrationId}/grades`);
+  return res.data;
+}
+
+export async function getAverage(registrationId: string): Promise<AverageDTO> {
+  const res = await api.get<AverageDTO>(`/registrations/${registrationId}/average`);
+  return res.data;
+}
+
+export async function getGradesByClass(classId: string): Promise<GradeDTO[]> {
+  const res = await api.get<GradeDTO[]>(`/classes/${classId}/grades`);
+  return res.data;
+}
+
+// ── Attendance ─────────────────────────────────────
+export interface ClassSessionDTO {
+  id: string;
+  classId: string;
+  date: string;
+  qrToken: string | null;
+  qrExpiresAt: string | null;
+  status: 'OPEN' | 'CLOSED' | 'CANCELLED';
+  closedAt: string | null;
+  qrDataUrl?: string;
+}
+
+export interface AttendanceDTO {
+  id: string;
+  registrationId: string;
+  classSessionId: string;
+  status: 'PRESENT' | 'ABSENT' | 'JUSTIFIED' | 'LATE';
+  method: 'MANUAL' | 'QR';
+  markedAt: string;
+  registration?: RegistrationDTO;
+}
+
+export async function createSession(classId: string): Promise<ClassSessionDTO> {
+  const res = await api.post<ClassSessionDTO>(`/classes/${classId}/sessions`);
+  return res.data;
+}
+
+export async function verifyQr(sessionId: string, qrToken: string): Promise<AttendanceDTO> {
+  const res = await api.post<AttendanceDTO>(`/sessions/${sessionId}/verify-qr`, { qrToken });
+  return res.data;
+}
+
+export async function recordManualAttendance(
+  classId: string,
+  sessionId: string,
+  input: { registrationId: string; status: string },
+): Promise<AttendanceDTO> {
+  const res = await api.post<AttendanceDTO>(
+    `/classes/${classId}/sessions/${sessionId}/attendances`,
+    input,
+  );
+  return res.data;
+}
+
+export async function listSessions(classId: string): Promise<ClassSessionDTO[]> {
+  const res = await api.get<ClassSessionDTO[]>(`/classes/${classId}/sessions`);
+  return res.data;
+}
+
+export async function listAttendances(sessionId: string): Promise<AttendanceDTO[]> {
+  const res = await api.get<AttendanceDTO[]>(`/sessions/${sessionId}/attendances`);
+  return res.data;
+}
+
+export async function updateAttendance(id: string, status: string): Promise<AttendanceDTO> {
+  const res = await api.patch<AttendanceDTO>(`/attendance/${id}`, { status });
+  return res.data;
+}
+
+export async function closeSession(sessionId: string): Promise<ClassSessionDTO> {
+  const res = await api.patch<ClassSessionDTO>(`/sessions/${sessionId}/close`, {});
+  return res.data;
+}
+
+export function useClassSessions(classId: string) {
+  return useQuery({
+    queryKey: ['sessions', classId],
+    queryFn: () => listSessions(classId),
+    enabled: !!classId,
+  });
+}
+
+export function useAttendances(sessionId: string) {
+  return useQuery({
+    queryKey: ['attendances', sessionId],
+    queryFn: () => listAttendances(sessionId),
+    enabled: !!sessionId,
+  });
+}
+
+export function useGradesByClass(classId: string) {
+  return useQuery({
+    queryKey: ['grades', 'class', classId],
+    queryFn: () => getGradesByClass(classId),
+    enabled: !!classId,
+  });
+}

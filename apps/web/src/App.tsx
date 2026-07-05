@@ -10,6 +10,9 @@ import { SelectionProcessesPage } from '@/features/selection-processes/selection
 import { EnrollmentsPage } from '@/features/enrollments/enrollments-page';
 import { ReviewEnrollmentsPage } from '@/features/enrollments/review-page';
 import { RegistrationsPage } from '@/features/registrations/registrations-page';
+import { AssessmentPlanPage } from '@/features/assessment/assessment-plan-page';
+import { GradesPage } from '@/features/grades/grades-page';
+import { AttendancePage } from '@/features/attendance/attendance-page';
 
 export function App() {
   return (
@@ -94,6 +97,38 @@ export function App() {
           <RequireAuth>
             <AppLayout>
               <RegistrationsPage />
+            </AppLayout>
+          </RequireAuth>
+        }
+      />
+
+      {/* Sprint 3 — Avaliação, Notas, Presença */}
+      <Route
+        path="/assessment"
+        element={
+          <RequireRole roles={['TEACHER', 'ADMIN']}>
+            <AppLayout>
+              <AssessmentPlanPage />
+            </AppLayout>
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/grades"
+        element={
+          <RequireAuth>
+            <AppLayout>
+              <GradesPage />
+            </AppLayout>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/attendance"
+        element={
+          <RequireAuth>
+            <AppLayout>
+              <AttendancePage />
             </AppLayout>
           </RequireAuth>
         }
