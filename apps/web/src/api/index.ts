@@ -213,3 +213,239 @@ export function useDisciplines(params: {
     placeholderData: (prev) => prev,
   });
 }
+
+// ── Selection Processes ─────────────────────────────────
+export interface SelectionProcessDTO {
+  id: string;
+  courseId: string;
+  academicYear: number;
+  period: 'FIRST' | 'SECOND';
+  title: string;
+  description: string | null;
+  openDate: string;
+  closeDate: string;
+  vacancies: number;
+  status: 'DRAFT' | 'OPEN' | 'CLOSED' | 'CANCELLED';
+  course: { id: string; name: string; code: string };
+  enrolledCount?: number;
+  createdAt: string;
+}
+
+export interface SelectionProcessInput {
+  courseId: string;
+  academicYear: number;
+  period: 'FIRST' | 'SECOND';
+  title: string;
+  description?: string;
+  openDate: string;
+  closeDate: string;
+  vacancies: number;
+}
+
+export async function listSelectionProcesses(params: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  courseId?: string;
+}) {
+  const res = await api.get<PageResult<SelectionProcessDTO>>('/selection-processes', { params });
+  return res.data;
+}
+
+export async function createSelectionProcess(
+  input: SelectionProcessInput,
+): Promise<SelectionProcessDTO> {
+  const res = await api.post<SelectionProcessDTO>('/selection-processes', input);
+  return res.data;
+}
+
+export async function updateSelectionProcess(
+  id: string,
+  input: Partial<SelectionProcessInput> & { status?: string },
+): Promise<SelectionProcessDTO> {
+  const res = await api.patch<SelectionProcessDTO>(`/selection-processes/${id}`, input);
+  return res.data;
+}
+
+export async function deleteSelectionProcess(id: string): Promise<void> {
+  await api.delete(`/selection-processes/${id}`);
+}
+
+export function useSelectionProcesses(params: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  courseId?: string;
+}) {
+  return useQuery({
+    queryKey: ['selection-processes', params],
+    queryFn: () => listSelectionProcesses(params),
+    placeholderData: (prev) => prev,
+  });
+}
+
+// ── Enrollments ─────────────────────────────────────────
+export interface EnrollmentDTO {
+  id: string;
+  userId: string;
+  selectionProcessId: string;
+  status: 'SUBMITTED' | 'IN_REVIEW' | 'APPROVED' | 'REJECTED' | 'WAITLIST';
+  reviewNote: string | null;
+  rejectionReason: string | null;
+  reviewedAt: string | null;
+  createdAt: string;
+  user?: { id: string; name: string; email: string };
+  selectionProcess?: {
+    id: string;
+    title: string;
+    course: { id: string; name: string; code: string };
+  };
+  reviewedBy?: { id: string; name: string } | null;
+  documents?: EnrollmentDocumentDTO[];
+}
+
+export interface EnrollmentDocumentDTO {
+  id: string;
+  enrollmentId: string;
+  type: 'ID_DOCUMENT' | 'PAYMENT_PROOF' | 'TRANSCRIPT' | 'PHOTO' | 'OTHER';
+  fileUrl: string;
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+  uploadedAt: string;
+}
+
+export async function listEnrollments(params: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+  selectionProcessId?: string;
+}) {
+  const res = await api.get<PageResult<EnrollmentDTO>>('/enrollments', { params });
+  return res.data;
+}
+
+export async function myEnrollments(): Promise<EnrollmentDTO[]> {
+  const res = await api.get<EnrollmentDTO[]>('/enrollments/mine');
+  return res.data;
+}
+
+export async function createEnrollment(selectionProcessId: string): Promise<EnrollmentDTO> {
+  const res = await api.post<EnrollmentDTO>('/enrollments', { selectionProcessId });
+  return res.data;
+}
+
+export async function getEnrollment(id: string): Promise<EnrollmentDTO> {
+  const res = await api.get<EnrollmentDTO>(`/enrollments/${id}`);
+  return res.data;
+}
+
+export async function listEnrollmentDocuments(id: string): Promise<EnrollmentDocumentDTO[]> {
+  const res = await api.get<EnrollmentDocumentDTO[]>(`/enrollments/${id}/documents`);
+  return res.data;
+}
+
+export async function uploadEnrollmentDocument(
+  enrollmentId: string,
+  file: File,
+  type: EnrollmentDocumentDTO['type'],
+): Promise<EnrollmentDocumentDTO> {
+  const form = new FormData();
+  form.append('file', file);
+  form.append('type', type);
+  const res = await api.post<EnrollmentDocumentDTO>(
+    `/enrollments/${enrollmentId}/documents`,
+    form,
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  );
+  return res.data;
+}
+
+export async function reviewEnrollment(
+  id: string,
+  decision: 'IN_REVIEW' | 'APPROVED' | 'REJECTED' | 'WAITLIST',
+  reviewNote?: string,
+  rejectionReason?: string,
+): Promise<EnrollmentDTO> {
+  const res = await api.post<EnrollmentDTO>(`/enrollments/${id}/review`, {
+    decision,
+    reviewNote,
+    rejectionReason,
+  });
+  return res.data;
+}
+
+export function useEnrollments(params: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+  selectionProcessId?: string;
+}) {
+  return useQuery({
+    queryKey: ['enrollments', params],
+    queryFn: () => listEnrollments(params),
+    placeholderData: (prev) => prev,
+  });
+}
+
+export function useMyEnrollments() {
+  return useQuery({
+    queryKey: ['enrollments', 'mine'],
+    queryFn: () => myEnrollments(),
+  });
+}
+
+// ── Registrations ───────────────────────────────────────
+export interface RegistrationDTO {
+  id: string;
+  studentId: string;
+  classId: string;
+  academicYear: number;
+  enrollmentId: string | null;
+  status: 'ACTIVE' | 'CANCELLED' | 'COMPLETED';
+  enrolledAt: string;
+  cancelledAt: string | null;
+  student?: { id: string; name: string; email: string };
+  class?: {
+    id: string;
+    discipline: { id: string; name: string; code: string };
+  };
+}
+
+export async function listRegistrations(params: {
+  page?: number;
+  pageSize?: number;
+  classId?: string;
+  studentId?: string;
+  status?: string;
+}) {
+  const res = await api.get<PageResult<RegistrationDTO>>('/registrations', { params });
+  return res.data;
+}
+
+export async function myRegistrations(): Promise<RegistrationDTO[]> {
+  const res = await api.get<RegistrationDTO[]>('/registrations/mine');
+  return res.data;
+}
+
+export async function createRegistration(input: {
+  classId: string;
+  academicYear: number;
+  enrollmentId?: string;
+}): Promise<RegistrationDTO> {
+  const res = await api.post<RegistrationDTO>('/registrations', input);
+  return res.data;
+}
+
+export async function cancelRegistration(id: string): Promise<void> {
+  await api.delete(`/registrations/${id}`);
+}
+
+export function useMyRegistrations() {
+  return useQuery({
+    queryKey: ['registrations', 'mine'],
+    queryFn: () => myRegistrations(),
+  });
+}

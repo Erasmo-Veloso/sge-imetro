@@ -6,6 +6,10 @@ import { DashboardPage } from '@/features/dashboard/dashboard-page';
 import { UsersPage } from '@/features/users/users-page';
 import { CoursesPage } from '@/features/courses/courses-page';
 import { DisciplinesPage } from '@/features/disciplines/disciplines-page';
+import { SelectionProcessesPage } from '@/features/selection-processes/selection-processes-page';
+import { EnrollmentsPage } from '@/features/enrollments/enrollments-page';
+import { ReviewEnrollmentsPage } from '@/features/enrollments/review-page';
+import { RegistrationsPage } from '@/features/registrations/registrations-page';
 
 export function App() {
   return (
@@ -22,7 +26,6 @@ export function App() {
           </RequireAuth>
         }
       />
-
       <Route
         path="/users"
         element={
@@ -33,7 +36,6 @@ export function App() {
           </RequireRole>
         }
       />
-
       <Route
         path="/courses"
         element={
@@ -44,13 +46,54 @@ export function App() {
           </RequireAuth>
         }
       />
-
       <Route
         path="/disciplines"
         element={
           <RequireAuth>
             <AppLayout>
               <DisciplinesPage />
+            </AppLayout>
+          </RequireAuth>
+        }
+      />
+
+      {/* Sprint 2 — Inscrição & Matrícula */}
+      <Route
+        path="/selection-processes"
+        element={
+          <RequireRole roles={['ADMIN']}>
+            <AppLayout>
+              <SelectionProcessesPage />
+            </AppLayout>
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/enrollments"
+        element={
+          <RequireAuth>
+            <AppLayout>
+              <EnrollmentsPage />
+            </AppLayout>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/review-enrollments"
+        element={
+          <RequireRole roles={['ADMIN']}>
+            <AppLayout>
+              <ReviewEnrollmentsPage />
+            </AppLayout>
+          </RequireRole>
+        }
+      />
+      <Route
+        path="/registrations"
+        element={
+          <RequireAuth>
+            <AppLayout>
+              <RegistrationsPage />
             </AppLayout>
           </RequireAuth>
         }

@@ -5,6 +5,9 @@ import {
   GraduationCap,
   BookOpen,
   LogOut,
+  ClipboardList,
+  FileCheck,
+  FileText,
   type LucideIcon,
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -26,6 +29,20 @@ const NAV: NavItem[] = [
     label: 'Disciplinas',
     to: '/disciplines',
     icon: BookOpen,
+    roles: ['ADMIN', 'TEACHER', 'STUDENT'],
+  },
+  {
+    label: 'Processos seletivos',
+    to: '/selection-processes',
+    icon: ClipboardList,
+    roles: ['ADMIN'],
+  },
+  { label: 'Inscrições', to: '/enrollments', icon: FileText, roles: ['STUDENT'] },
+  { label: 'Rever inscrições', to: '/review-enrollments', icon: FileCheck, roles: ['ADMIN'] },
+  {
+    label: 'Matrículas',
+    to: '/registrations',
+    icon: GraduationCap,
     roles: ['ADMIN', 'TEACHER', 'STUDENT'],
   },
 ];
