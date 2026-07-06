@@ -49,6 +49,8 @@ const NAV: NavItem[] = [
   { label: 'Avaliação', to: '/assessment', icon: ClipboardList, roles: ['TEACHER', 'ADMIN'] },
   { label: 'Notas', to: '/grades', icon: FileText, roles: ['TEACHER', 'STUDENT', 'ADMIN'] },
   { label: 'Presença', to: '/attendance', icon: ClipboardList, roles: ['TEACHER', 'STUDENT'] },
+  { label: 'Pagamentos', to: '/payments', icon: FileText, roles: ['STUDENT', 'ADMIN'] },
+  { label: 'Documentos', to: '/audit-documents', icon: FileText, roles: ['STUDENT', 'ADMIN'] },
 ];
 
 const ROLE_LABELS: Record<string, string> = {

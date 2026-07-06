@@ -716,3 +716,137 @@ export function useGradesByClass(classId: string) {
     enabled: !!classId,
   });
 }
+
+// ── Payments ───────────────────────────────────────
+export interface PaymentDTO {
+  id: string;
+  userId: string;
+  amount: number;
+  concept: string;
+  status: 'PENDING' | 'COMPLETED' | 'FAILED';
+  gateway: string;
+  reference: string | null;
+  rawResponse: Record<string, unknown> | null;
+  createdAt: string;
+  user?: { id: string; name: string; email: string };
+}
+
+export async function createPayment(input: {
+  amount: number;
+  concept: string;
+}): Promise<PaymentDTO> {
+  const res = await api.post<PaymentDTO>('/payments', input);
+  return res.data;
+}
+
+export async function processPayment(input: {
+  paymentId: string;
+  phone: string;
+  pin: string;
+}): Promise<PaymentDTO> {
+  const res = await api.post<PaymentDTO>('/payments/process', input);
+  return res.data;
+}
+
+export async function myPayments(): Promise<PaymentDTO[]> {
+  const res = await api.get<PaymentDTO[]>('/payments/mine');
+  return res.data;
+}
+
+export async function listPayments(params: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+}) {
+  const res = await api.get<PageResult<PaymentDTO>>('/payments', { params });
+  return res.data;
+}
+
+export function useMyPayments() {
+  return useQuery({
+    queryKey: ['payments', 'mine'],
+    queryFn: () => myPayments(),
+  });
+}
+
+export function usePayments(params: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+}) {
+  return useQuery({
+    queryKey: ['payments', params],
+    queryFn: () => listPayments(params),
+    placeholderData: (prev) => prev,
+  });
+}
+
+// ── Audit Documents ────────────────────────────────
+export interface AuditDocumentDTO {
+  id: string;
+  ownerId: string;
+  type: string;
+  fileUrl: string;
+  status: 'PENDING' | 'VERIFIED' | 'REJECTED';
+  createdAt: string;
+  user?: { id: string; name: string; email: string };
+}
+
+export async function uploadAuditDocument(file: File, type: string): Promise<AuditDocumentDTO> {
+  const form = new FormData();
+  form.append('file', file);
+  form.append('type', type);
+  const res = await api.post<AuditDocumentDTO>('/audit/documents', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data;
+}
+
+export async function myAuditDocuments(): Promise<AuditDocumentDTO[]> {
+  const res = await api.get<AuditDocumentDTO[]>('/audit/documents/mine');
+  return res.data;
+}
+
+export async function listAuditDocuments(params: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+}) {
+  const res = await api.get<PageResult<AuditDocumentDTO>>('/audit/documents', { params });
+  return res.data;
+}
+
+export async function verifyAuditDocument(
+  documentId: string,
+  decision: 'VERIFIED' | 'REJECTED',
+  note?: string,
+): Promise<AuditDocumentDTO> {
+  const res = await api.post<AuditDocumentDTO>(`/audit/documents/${documentId}/verify`, {
+    decision,
+    note,
+  });
+  return res.data;
+}
+
+export function useMyAuditDocuments() {
+  return useQuery({
+    queryKey: ['audit-documents', 'mine'],
+    queryFn: () => myAuditDocuments(),
+  });
+}
+
+export function useAuditDocuments(params: {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
+}) {
+  return useQuery({
+    queryKey: ['audit-documents', params],
+    queryFn: () => listAuditDocuments(params),
+    placeholderData: (prev) => prev,
+  });
+}

@@ -14,6 +14,8 @@ import { ClassesPage } from '@/features/classes/classes-page';
 import { AssessmentPlanPage } from '@/features/assessment/assessment-plan-page';
 import { GradesPage } from '@/features/grades/grades-page';
 import { AttendancePage } from '@/features/attendance/attendance-page';
+import { PaymentsPage } from '@/features/payments/payments-page';
+import { AuditDocumentsPage } from '@/features/audit/audit-documents-page';
 
 export function App() {
   return (
@@ -140,6 +142,28 @@ export function App() {
           <RequireAuth>
             <AppLayout>
               <AttendancePage />
+            </AppLayout>
+          </RequireAuth>
+        }
+      />
+
+      {/* Sprint 4 — Pagamentos & Documentos de auditoria */}
+      <Route
+        path="/payments"
+        element={
+          <RequireAuth>
+            <AppLayout>
+              <PaymentsPage />
+            </AppLayout>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/audit-documents"
+        element={
+          <RequireAuth>
+            <AppLayout>
+              <AuditDocumentsPage />
             </AppLayout>
           </RequireAuth>
         }
