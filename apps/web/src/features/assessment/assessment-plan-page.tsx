@@ -4,12 +4,15 @@ import { Plus, Trash2, Loader2, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   useMyRegistrations,
+  useClasses,
   useAssessmentPlan,
   createAssessmentPlan,
   updateAssessmentPlan,
   extractApiError,
   type AssessmentItemDTO,
+  type ClassDTO,
 } from '@/api';
+import { useAuth } from '@/features/auth/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
@@ -36,13 +39,28 @@ interface ItemForm {
 }
 
 export function AssessmentPlanPage() {
+  const { user } = useAuth();
+  const isStudent = user?.role === 'STUDENT';
+
   const myRegQ = useMyRegistrations();
+  const classesQ = useClasses({ page: 1, pageSize: 200 });
+
   const [selectedClassId, setSelectedClassId] = useState<string>('');
   const planQ = useAssessmentPlan(selectedClassId);
   const queryClient = useQueryClient();
 
-  const classes = myRegQ.data?.filter((r) => r.status === 'ACTIVE').map((r) => r.class) ?? [];
-  const uniqueClasses = classes.filter((c, i, arr) => arr.findIndex((x) => x?.id === c?.id) === i);
+  let classOptions: ClassDTO[] = [];
+  if (isStudent) {
+    const seen = new Set<string>();
+    for (const r of myRegQ.data ?? []) {
+      if (r.status === 'ACTIVE' && r.class && !seen.has(r.class.id)) {
+        seen.add(r.class.id);
+        classOptions.push(r.class as ClassDTO);
+      }
+    }
+  } else {
+    classOptions = classesQ.data?.items ?? [];
+  }
 
   const [editing, setEditing] = useState(false);
   const [items, setItems] = useState<ItemForm[]>([]);
@@ -51,10 +69,14 @@ export function AssessmentPlanPage() {
   const [minAttendancePct, setMinAttendancePct] = useState(75);
   const [roundingRule, setRoundingRule] = useState('NONE');
 
-  const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
+  const totalWeight = Math.round(items.reduce((sum, item) => sum + item.weight, 0) * 100) / 100;
 
   function startCreate() {
     setItems([{ type: 'TEST', name: '', weight: 0, maxScore: 20 }]);
+    setScaleMax(20);
+    setPassingScore(10);
+    setMinAttendancePct(75);
+    setRoundingRule('NONE');
     setEditing(true);
   }
 
@@ -142,14 +164,12 @@ export function AssessmentPlanPage() {
           className="border-input bg-background flex h-9 w-full rounded-md border px-3 text-sm"
         >
           <option value="">Selecione uma turma</option>
-          {uniqueClasses.map(
-            (c) =>
-              c && (
-                <option key={c.id} value={c.id}>
-                  {c.discipline.name} ({c.discipline.code})
-                </option>
-              ),
-          )}
+          {classOptions.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.discipline?.name} ({c.discipline?.code}) — {c.year}º{' '}
+              {c.period === 'FIRST' ? '1º Sem' : '2º Sem'}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -252,7 +272,7 @@ export function AssessmentPlanPage() {
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium">Itens de avaliação</label>
                   <span
-                    className={`text-sm ${totalWeight === 100 ? 'text-green-600' : 'text-red-600'}`}
+                    className={`text-sm ${Math.abs(totalWeight - 100) <= 0.01 ? 'text-green-600' : 'text-red-600'}`}
                   >
                     Total: {totalWeight}%
                   </span>
@@ -311,8 +331,9 @@ export function AssessmentPlanPage() {
                 </Button>
                 <Button
                   disabled={
-                    totalWeight !== 100 ||
+                    Math.abs(totalWeight - 100) > 0.01 ||
                     items.some((i) => !i.name) ||
+                    items.length === 0 ||
                     createMut.isPending ||
                     updateMut.isPending
                   }
