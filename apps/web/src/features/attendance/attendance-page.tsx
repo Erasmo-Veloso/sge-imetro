@@ -4,6 +4,7 @@ import { Plus, Loader2, QrCode, CheckCircle, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   useMyRegistrations,
+  useClasses,
   useClassSessions,
   useAttendances,
   createSession,
@@ -20,13 +21,24 @@ import { useAuth } from '@/features/auth/auth-provider';
 
 export function AttendancePage() {
   const { user } = useAuth();
+  const isStudent = user?.role === 'STUDENT';
   const myRegQ = useMyRegistrations();
+  const classesQ = useClasses({ page: 1, pageSize: 200 });
+
   const [selectedClassId, setSelectedClassId] = useState<string>('');
 
-  const classes = myRegQ.data?.filter((r) => r.status === 'ACTIVE').map((r) => r.class) ?? [];
-  const uniqueClasses = classes.filter((c, i, arr) => arr.findIndex((x) => x?.id === c?.id) === i);
-
-  const isStudent = user?.role === 'STUDENT';
+  let classOptions: any[] = [];
+  if (isStudent) {
+    const seen = new Set<string>();
+    for (const r of myRegQ.data ?? []) {
+      if (r.status === 'ACTIVE' && r.class && !seen.has(r.class.id)) {
+        seen.add(r.class.id);
+        classOptions.push(r.class);
+      }
+    }
+  } else {
+    classOptions = classesQ.data?.items ?? [];
+  }
 
   return (
     <div className="space-y-4">
@@ -49,14 +61,11 @@ export function AttendancePage() {
               className="border-input bg-background flex h-9 w-full rounded-md border px-3 text-sm"
             >
               <option value="">Selecione uma turma</option>
-              {uniqueClasses.map(
-                (c) =>
-                  c && (
-                    <option key={c.id} value={c.id}>
-                      {c.discipline.name} ({c.discipline.code})
-                    </option>
-                  ),
-              )}
+              {classOptions.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.discipline?.name} ({c.discipline?.code})
+                </option>
+              ))}
             </select>
           </div>
           {selectedClassId && <TeacherAttendanceView classId={selectedClassId} />}
@@ -126,7 +135,9 @@ function TeacherAttendanceView({ classId }: { classId: string }) {
   const createMut = useMutation({
     mutationFn: () => createSession(classId),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['sessions', classId] });
+      queryClient.setQueryData(['sessions', classId], (old: ClassSessionDTO[] | undefined) => {
+        return [data, ...(old ?? [])];
+      });
       setSelectedSessionId(data.id);
       toast.success('Sessão criada');
     },
