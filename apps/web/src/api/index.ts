@@ -692,6 +692,11 @@ export async function closeSession(sessionId: string): Promise<ClassSessionDTO> 
   return res.data;
 }
 
+export async function getSession(sessionId: string): Promise<ClassSessionDTO> {
+  const res = await api.get<ClassSessionDTO>(`/sessions/${sessionId}`);
+  return res.data;
+}
+
 export function useClassSessions(classId: string) {
   return useQuery({
     queryKey: ['sessions', classId],

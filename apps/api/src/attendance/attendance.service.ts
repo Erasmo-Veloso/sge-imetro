@@ -122,6 +122,24 @@ export class AttendanceService {
     });
   }
 
+  async findOne(sessionId: string) {
+    const session = await this.prisma.classSession.findUnique({
+      where: { id: sessionId },
+    });
+    if (!session) throw new NotFoundException('Sessão não encontrada');
+
+    let result: any = { ...session };
+    if (
+      session.status === 'OPEN' &&
+      session.qrToken &&
+      session.qrExpiresAt &&
+      session.qrExpiresAt > new Date()
+    ) {
+      result.qrDataUrl = await QRCode.toDataURL(session.qrToken);
+    }
+    return result;
+  }
+
   async listAttendances(sessionId: string) {
     const session = await this.prisma.classSession.findUnique({ where: { id: sessionId } });
     if (!session) throw new NotFoundException('Sessão não encontrada');

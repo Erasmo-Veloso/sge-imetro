@@ -38,6 +38,17 @@ export class AttendanceController {
     return this.attendance.listSessions(classId);
   }
 
+  @Get('sessions/:sessionId')
+  getSession(@Param('sessionId', ParseIdPipe) sessionId: string) {
+    return this.attendance.findOne(sessionId);
+  }
+
+  @Roles('TEACHER')
+  @Patch('sessions/:sessionId/close')
+  closeSession(@Param('sessionId', ParseIdPipe) sessionId: string) {
+    return this.attendance.closeSession(sessionId);
+  }
+
   @Roles('TEACHER')
   @Get('sessions/:sessionId/attendances')
   listAttendances(@Param('sessionId', ParseIdPipe) sessionId: string) {
