@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { ParseIdPipe } from '../common/parse-id.pipe';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/current-user.decorator';
@@ -13,8 +14,8 @@ export class GradesController {
   @Roles('TEACHER')
   @Post('classes/:classId/sessions/:sessionId/grades')
   bulkRecord(
-    @Param('classId', ParseUUIDPipe) classId: string,
-    @Param('sessionId', ParseUUIDPipe) sessionId: string,
+    @Param('classId', ParseIdPipe) classId: string,
+    @Param('sessionId', ParseIdPipe) sessionId: string,
     @Body() dto: BulkRecordGradesDto,
     @CurrentUser('id') teacherId: string,
   ) {
@@ -22,12 +23,12 @@ export class GradesController {
   }
 
   @Get('registrations/:registrationId/grades')
-  findByRegistration(@Param('registrationId', ParseUUIDPipe) registrationId: string) {
+  findByRegistration(@Param('registrationId', ParseIdPipe) registrationId: string) {
     return this.grades.findByRegistration(registrationId);
   }
 
   @Get('registrations/:registrationId/average')
-  calculateAverage(@Param('registrationId', ParseUUIDPipe) registrationId: string) {
+  calculateAverage(@Param('registrationId', ParseIdPipe) registrationId: string) {
     return this.grades.calculateAverage(registrationId);
   }
 }

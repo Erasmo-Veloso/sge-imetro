@@ -1,13 +1,5 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { ParseIdPipe } from '../common/parse-id.pipe';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/current-user.decorator';
@@ -21,7 +13,7 @@ export class AttendanceController {
 
   @Roles('TEACHER')
   @Post('classes/:classId/sessions')
-  createSession(@Param('classId', ParseUUIDPipe) classId: string) {
+  createSession(@Param('classId', ParseIdPipe) classId: string) {
     return this.attendance.createSession(classId);
   }
 
@@ -34,27 +26,27 @@ export class AttendanceController {
   @Roles('TEACHER')
   @Post('classes/:classId/sessions/:sessionId/attendances')
   recordManual(
-    @Param('classId', ParseUUIDPipe) classId: string,
-    @Param('sessionId', ParseUUIDPipe) sessionId: string,
+    @Param('classId', ParseIdPipe) classId: string,
+    @Param('sessionId', ParseIdPipe) sessionId: string,
     @Body() dto: RecordAttendanceDto,
   ) {
     return this.attendance.recordManual(classId, sessionId, dto);
   }
 
   @Get('classes/:classId/sessions')
-  listSessions(@Param('classId', ParseUUIDPipe) classId: string) {
+  listSessions(@Param('classId', ParseIdPipe) classId: string) {
     return this.attendance.listSessions(classId);
   }
 
   @Roles('TEACHER')
   @Get('sessions/:sessionId/attendances')
-  listAttendances(@Param('sessionId', ParseUUIDPipe) sessionId: string) {
+  listAttendances(@Param('sessionId', ParseIdPipe) sessionId: string) {
     return this.attendance.listAttendances(sessionId);
   }
 
   @Roles('TEACHER')
   @Patch('attendance/:id')
-  updateAttendance(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateAttendanceDto) {
+  updateAttendance(@Param('id', ParseIdPipe) id: string, @Body() dto: UpdateAttendanceDto) {
     return this.attendance.updateAttendance(id, dto.status);
   }
 }

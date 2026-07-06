@@ -3,13 +3,13 @@ import {
   Controller,
   Get,
   Param,
-  ParseUUIDPipe,
   Post,
   Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { ParseIdPipe } from '../common/parse-id.pipe';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -36,7 +36,7 @@ export class EnrollmentsController {
   @Post(':id/documents')
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))
   uploadDocument(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIdPipe) id: string,
     @CurrentUser() user: AuthUser,
     @UploadedFile() file: Express.Multer.File,
     @Body('type')
@@ -47,12 +47,12 @@ export class EnrollmentsController {
   }
 
   @Get(':id/documents')
-  listDocuments(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthUser) {
+  listDocuments(@Param('id', ParseIdPipe) id: string, @CurrentUser() user: AuthUser) {
     return this.enrollments.listDocuments(id, user.id);
   }
 
   @Get(':id')
-  show(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthUser) {
+  show(@Param('id', ParseIdPipe) id: string, @CurrentUser() user: AuthUser) {
     return this.enrollments.findOne(id, user.id, user.role);
   }
 
@@ -65,7 +65,7 @@ export class EnrollmentsController {
   @Roles('ADMIN')
   @Post(':id/review')
   review(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIdPipe) id: string,
     @CurrentUser() user: AuthUser,
     @Body() dto: ReviewEnrollmentDto,
   ) {

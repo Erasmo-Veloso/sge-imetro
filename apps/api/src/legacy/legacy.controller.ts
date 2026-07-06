@@ -3,13 +3,13 @@ import {
   Controller,
   Get,
   Param,
-  ParseUUIDPipe,
   Post,
   Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { ParseIdPipe } from '../common/parse-id.pipe';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -36,7 +36,7 @@ export class LegacyController {
 
   @Roles('ADMIN')
   @Get('imports/:id')
-  getStatus(@Param('id', ParseUUIDPipe) id: string) {
+  getStatus(@Param('id', ParseIdPipe) id: string) {
     return this.legacy.getStatus(id);
   }
 }

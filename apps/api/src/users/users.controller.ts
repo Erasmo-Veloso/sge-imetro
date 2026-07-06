@@ -4,12 +4,12 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
   Patch,
   Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ParseIdPipe } from '../common/parse-id.pipe';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UsersService } from './users.service';
@@ -28,7 +28,7 @@ export class UsersController {
 
   @Roles('ADMIN')
   @Get(':id')
-  show(@Param('id', ParseUUIDPipe) id: string) {
+  show(@Param('id', ParseIdPipe) id: string) {
     return this.users.findOne(id);
   }
 
@@ -40,13 +40,13 @@ export class UsersController {
 
   @Roles('ADMIN')
   @Patch(':id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateUserDto) {
+  update(@Param('id', ParseIdPipe) id: string, @Body() dto: UpdateUserDto) {
     return this.users.update(id, dto);
   }
 
   @Roles('ADMIN')
   @Delete(':id')
-  async remove(@Param('id', ParseUUIDPipe) id: string) {
+  async remove(@Param('id', ParseIdPipe) id: string) {
     await this.users.remove(id);
   }
 }

@@ -1,14 +1,5 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { ParseIdPipe } from '../common/parse-id.pipe';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { AssessmentPlansService } from './assessment-plans.service';
@@ -22,24 +13,24 @@ export class AssessmentPlansController {
 
   @Roles('TEACHER', 'ADMIN')
   @Post('classes/:classId/assessment-plan')
-  create(@Param('classId', ParseUUIDPipe) classId: string, @Body() dto: CreateAssessmentPlanDto) {
+  create(@Param('classId', ParseIdPipe) classId: string, @Body() dto: CreateAssessmentPlanDto) {
     return this.plans.create(classId, dto);
   }
 
   @Get('classes/:classId/assessment-plan')
-  findByClass(@Param('classId', ParseUUIDPipe) classId: string) {
+  findByClass(@Param('classId', ParseIdPipe) classId: string) {
     return this.plans.findByClass(classId);
   }
 
   @Roles('TEACHER', 'ADMIN')
   @Patch('assessment-plans/:id')
-  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateAssessmentPlanDto) {
+  update(@Param('id', ParseIdPipe) id: string, @Body() dto: UpdateAssessmentPlanDto) {
     return this.plans.update(id, dto);
   }
 
   @Roles('ADMIN')
   @Delete('assessment-plans/:id')
-  async remove(@Param('id', ParseUUIDPipe) id: string) {
+  async remove(@Param('id', ParseIdPipe) id: string) {
     await this.plans.remove(id);
   }
 }

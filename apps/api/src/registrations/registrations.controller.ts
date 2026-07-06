@@ -1,14 +1,5 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { ParseIdPipe } from '../common/parse-id.pipe';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser, type AuthUser } from '../common/current-user.decorator';
 import { RegistrationsService } from './registrations.service';
@@ -35,7 +26,7 @@ export class RegistrationsController {
   }
 
   @Delete(':id')
-  async cancel(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthUser) {
+  async cancel(@Param('id', ParseIdPipe) id: string, @CurrentUser() user: AuthUser) {
     await this.registrations.cancel(id, user.id, user.role);
   }
 }
