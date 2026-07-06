@@ -129,12 +129,7 @@ export class AttendanceService {
     if (!session) throw new NotFoundException('Sessão não encontrada');
 
     let result: any = { ...session };
-    if (
-      session.status === 'OPEN' &&
-      session.qrToken &&
-      session.qrExpiresAt &&
-      session.qrExpiresAt > new Date()
-    ) {
+    if (session.status === 'OPEN' && session.qrToken) {
       result.qrDataUrl = await QRCode.toDataURL(session.qrToken);
     }
     return result;
