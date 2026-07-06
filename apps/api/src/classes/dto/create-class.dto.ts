@@ -1,11 +1,12 @@
-import { IsInt, IsOptional, IsString, IsUUID, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, Min, MinLength } from 'class-validator';
 
 export class CreateClassDto {
-  @IsUUID()
+  @IsString()
+  @MinLength(1)
   disciplineId!: string;
 
   @IsOptional()
-  @IsUUID()
+  @IsString()
   teacherId?: string;
 
   @IsInt()
