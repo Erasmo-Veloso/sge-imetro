@@ -29,7 +29,7 @@ export class AssessmentPlansService {
             type: item.type,
             name: item.name,
             weight: item.weight,
-            maxScore: item.maxScore,
+            maxScore: item.maxScore ?? dto.scaleMax,
             order: item.order ?? index,
           })),
         },
@@ -60,11 +60,13 @@ export class AssessmentPlansService {
   }
 
   async update(id: string, dto: UpdateAssessmentPlanDto) {
-    await this.findOne(id);
+    const current = await this.findOne(id);
 
     if (dto.items) {
       this.validateWeights(dto.items);
     }
+
+    const scaleMax = dto.scaleMax ?? current.scaleMax;
 
     const plan = await this.prisma.assessmentPlan.update({
       where: { id },
@@ -80,7 +82,7 @@ export class AssessmentPlansService {
                 type: item.type!,
                 name: item.name!,
                 weight: item.weight!,
-                maxScore: item.maxScore!,
+                maxScore: item.maxScore ?? scaleMax,
                 order: item.order ?? index,
               })),
             }

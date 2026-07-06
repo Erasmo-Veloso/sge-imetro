@@ -28,10 +28,11 @@ export class CreateAssessmentItemDto {
   @Max(100)
   weight!: number;
 
+  @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(100)
-  maxScore!: number;
+  maxScore?: number;
 
   @IsOptional()
   @IsInt()

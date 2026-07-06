@@ -552,7 +552,7 @@ export async function createAssessmentPlan(
     passingScore?: number;
     minAttendancePct?: number;
     roundingRule?: string;
-    items: { type: string; name: string; weight: number; maxScore: number; order?: number }[];
+    items: { type: string; name: string; weight: number; order?: number }[];
   },
 ): Promise<AssessmentPlanDTO> {
   const res = await api.post<AssessmentPlanDTO>(`/classes/${classId}/assessment-plan`, input);
@@ -566,7 +566,7 @@ export async function updateAssessmentPlan(
     passingScore: number;
     minAttendancePct: number;
     roundingRule: string;
-    items: { type: string; name: string; weight: number; maxScore: number; order?: number }[];
+    items: { type: string; name: string; weight: number; order?: number }[];
   }>,
 ): Promise<AssessmentPlanDTO> {
   const res = await api.patch<AssessmentPlanDTO>(`/assessment-plans/${id}`, input);

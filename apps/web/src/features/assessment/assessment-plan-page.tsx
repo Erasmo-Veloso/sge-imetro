@@ -35,7 +35,6 @@ interface ItemForm {
   type: AssessmentItemDTO['type'];
   name: string;
   weight: number;
-  maxScore: number;
 }
 
 export function AssessmentPlanPage() {
@@ -72,7 +71,7 @@ export function AssessmentPlanPage() {
   const totalWeight = Math.round(items.reduce((sum, item) => sum + item.weight, 0) * 100) / 100;
 
   function startCreate() {
-    setItems([{ type: 'TEST', name: '', weight: 0, maxScore: 20 }]);
+    setItems([{ type: 'TEST', name: '', weight: 0 }]);
     setScaleMax(20);
     setPassingScore(10);
     setMinAttendancePct(75);
@@ -91,7 +90,6 @@ export function AssessmentPlanPage() {
           type: item.type,
           name: item.name,
           weight: item.weight,
-          maxScore: item.maxScore,
         })),
       );
       setEditing(true);
@@ -99,7 +97,7 @@ export function AssessmentPlanPage() {
   }
 
   function addItem() {
-    setItems([...items, { type: 'TEST', name: '', weight: 0, maxScore: 20 }]);
+    setItems([...items, { type: 'TEST', name: '', weight: 0 }]);
   }
 
   function removeItem(index: number) {
@@ -305,13 +303,7 @@ export function AssessmentPlanPage() {
                         value={item.weight}
                         onChange={(e) => updateItem(index, 'weight', Number(e.target.value))}
                         className="border-input bg-background flex h-9 w-20 rounded-md border px-3 text-sm"
-                      />
-                      <input
-                        type="number"
-                        placeholder="Max"
-                        value={item.maxScore}
-                        onChange={(e) => updateItem(index, 'maxScore', Number(e.target.value))}
-                        className="border-input bg-background flex h-9 w-20 rounded-md border px-3 text-sm"
+                        title="Peso percentual na nota final (a soma de todos os itens deve ser 100%)"
                       />
                       <Button variant="ghost" size="sm" onClick={() => removeItem(index)}>
                         <Trash2 className="text-destructive size-4" />
