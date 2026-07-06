@@ -12,14 +12,13 @@ export class GradesController {
   constructor(private readonly grades: GradesService) {}
 
   @Roles('TEACHER')
-  @Post('classes/:classId/sessions/:sessionId/grades')
+  @Post('classes/:classId/grades')
   bulkRecord(
     @Param('classId', ParseIdPipe) classId: string,
-    @Param('sessionId', ParseIdPipe) sessionId: string,
     @Body() dto: BulkRecordGradesDto,
     @CurrentUser('id') teacherId: string,
   ) {
-    return this.grades.bulkRecord(classId, sessionId, dto, teacherId);
+    return this.grades.bulkRecord(classId, dto, teacherId);
   }
 
   @Get('registrations/:registrationId/grades')

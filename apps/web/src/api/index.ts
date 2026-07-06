@@ -605,10 +605,9 @@ export interface AverageDTO {
 
 export async function bulkRecordGrades(
   classId: string,
-  sessionId: string,
   grades: { registrationId: string; assessmentItemId: string; score: number; note?: string }[],
 ): Promise<GradeDTO[]> {
-  const res = await api.post<GradeDTO[]>(`/classes/${classId}/sessions/${sessionId}/grades`, {
+  const res = await api.post<GradeDTO[]>(`/classes/${classId}/grades`, {
     grades,
   });
   return res.data;

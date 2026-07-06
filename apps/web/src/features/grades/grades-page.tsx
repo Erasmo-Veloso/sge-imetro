@@ -4,11 +4,13 @@ import { Loader2, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   useMyRegistrations,
+  useClasses,
   useAssessmentPlan,
   useGradesByClass,
   getGradesByRegistration,
   getAverage,
   bulkRecordGrades,
+  listRegistrations,
   extractApiError,
 } from '@/api';
 import { Button } from '@/components/ui/button';
@@ -18,13 +20,25 @@ import { useAuth } from '@/features/auth/auth-provider';
 
 export function GradesPage() {
   const { user } = useAuth();
+  const isStudent = user?.role === 'STUDENT';
+
   const myRegQ = useMyRegistrations();
+  const classesQ = useClasses({ page: 1, pageSize: 200 });
+
   const [selectedClassId, setSelectedClassId] = useState<string>('');
 
-  const classes = myRegQ.data?.filter((r) => r.status === 'ACTIVE').map((r) => r.class) ?? [];
-  const uniqueClasses = classes.filter((c, i, arr) => arr.findIndex((x) => x?.id === c?.id) === i);
-
-  const isStudent = user?.role === 'STUDENT';
+  let classOptions: any[] = [];
+  if (isStudent) {
+    const seen = new Set<string>();
+    for (const r of myRegQ.data ?? []) {
+      if (r.status === 'ACTIVE' && r.class && !seen.has(r.class.id)) {
+        seen.add(r.class.id);
+        classOptions.push(r.class);
+      }
+    }
+  } else {
+    classOptions = classesQ.data?.items ?? [];
+  }
 
   return (
     <div className="space-y-4">
@@ -47,14 +61,11 @@ export function GradesPage() {
               className="border-input bg-background flex h-9 w-full rounded-md border px-3 text-sm"
             >
               <option value="">Selecione uma turma</option>
-              {uniqueClasses.map(
-                (c) =>
-                  c && (
-                    <option key={c.id} value={c.id}>
-                      {c.discipline.name} ({c.discipline.code})
-                    </option>
-                  ),
-              )}
+              {classOptions.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.discipline?.name} ({c.discipline?.code})
+                </option>
+              ))}
             </select>
           </div>
           {selectedClassId && <TeacherGradesView classId={selectedClassId} />}
@@ -150,9 +161,12 @@ function TeacherGradesView({ classId }: { classId: string }) {
   const planQ = useAssessmentPlan(classId);
   const gradesQ = useGradesByClass(classId);
 
-  const myRegQ = useMyRegistrations();
-  const registrations =
-    myRegQ.data?.filter((r) => r.classId === classId && r.status === 'ACTIVE') ?? [];
+  const registrationsQ = useQuery({
+    queryKey: ['registrations', 'by-class', classId],
+    queryFn: () => listRegistrations({ classId, pageSize: 100, status: 'ACTIVE' }),
+  });
+
+  const registrations = registrationsQ.data?.items ?? [];
 
   const [grades, setGrades] = useState<Record<string, Record<string, number>>>({});
 
@@ -178,7 +192,7 @@ function TeacherGradesView({ classId }: { classId: string }) {
           score,
         })),
       );
-      return bulkRecordGrades(classId, 'current', gradesToSubmit);
+      return bulkRecordGrades(classId, gradesToSubmit);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['grades', 'class', classId] });

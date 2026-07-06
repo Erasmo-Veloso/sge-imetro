@@ -8,19 +8,9 @@ export class GradesService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async bulkRecord(
-    classId: string,
-    sessionId: string,
-    dto: BulkRecordGradesDto,
-    teacherId: string,
-  ) {
+  async bulkRecord(classId: string, dto: BulkRecordGradesDto, teacherId: string) {
     const classRecord = await this.prisma.class.findUnique({ where: { id: classId } });
     if (!classRecord) throw new NotFoundException('Turma não encontrada');
-
-    const session = await this.prisma.classSession.findFirst({
-      where: { id: sessionId, classId },
-    });
-    if (!session) throw new NotFoundException('Sessão não encontrada');
 
     const results: { registrationId: string; assessmentItemId: string; score: number }[] = [];
 
