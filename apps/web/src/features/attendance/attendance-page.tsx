@@ -269,10 +269,21 @@ function SessionDetailView({ sessionId, onBack }: { sessionId: string; onBack: (
               )}
             </div>
 
-            {session.status === 'OPEN' && session.qrDataUrl && (
+            {session.status === 'OPEN' && session.qrDataUrl && session.qrToken && (
               <div className="mt-6 flex flex-col items-center gap-3">
                 <p className="text-sm font-medium">QR Code para alunos</p>
                 <img src={session.qrDataUrl} alt="QR Code" className="h-48 w-48" />
+                <p
+                  className="bg-muted max-w-xs cursor-pointer select-all rounded-md px-3 py-1.5 text-center font-mono text-xs tracking-wider"
+                  onClick={() => {
+                    navigator.clipboard
+                      .writeText(session.qrToken!)
+                      .then(() => toast.success('Código copiado'));
+                  }}
+                  title="Clique para copiar"
+                >
+                  {session.qrToken}
+                </p>
                 <p className="text-muted-foreground text-xs">
                   Válido até{' '}
                   {session.qrExpiresAt
