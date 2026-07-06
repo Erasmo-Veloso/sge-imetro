@@ -461,3 +461,19 @@ model Payment {
   @@index([status])
   @@map("payments")
 }
+
+model LegacyImport {
+  id               String    @id @default(cuid())
+  type             String
+  filename         String
+  status           String    @default("PENDING")
+  totalRecords     Int       @default(0)
+  processedRecords Int       @default(0)
+  errorRecords     Int       @default(0)
+  errors           Json?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime  @default(now())
+
+  @@map("legacy_imports")
+}

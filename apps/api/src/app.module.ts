@@ -18,6 +18,7 @@ import { GradesModule } from './grades/grades.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { PaymentsModule } from './payments/payments.module';
 import { AuditModule } from './audit/audit.module';
+import { LegacyModule } from './legacy/legacy.module';
 import { validateEnv } from './config/env';
 
 @Module({
@@ -43,6 +44,7 @@ import { validateEnv } from './config/env';
     AttendanceModule,
     PaymentsModule,
     AuditModule,
+    LegacyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

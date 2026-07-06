@@ -16,6 +16,7 @@ import { GradesPage } from '@/features/grades/grades-page';
 import { AttendancePage } from '@/features/attendance/attendance-page';
 import { PaymentsPage } from '@/features/payments/payments-page';
 import { AuditDocumentsPage } from '@/features/audit/audit-documents-page';
+import { LegacyImportPage } from '@/features/legacy/legacy-import-page';
 
 export function App() {
   return (
@@ -166,6 +167,16 @@ export function App() {
               <AuditDocumentsPage />
             </AppLayout>
           </RequireAuth>
+        }
+      />
+      <Route
+        path="/legacy"
+        element={
+          <RequireRole roles={['ADMIN']}>
+            <AppLayout>
+              <LegacyImportPage />
+            </AppLayout>
+          </RequireRole>
         }
       />
 

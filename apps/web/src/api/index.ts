@@ -850,3 +850,51 @@ export function useAuditDocuments(params: {
     placeholderData: (prev) => prev,
   });
 }
+
+// ── Legacy Import ────────────────────────────────
+export interface LegacyImportDTO {
+  id: string;
+  type: 'CSV' | 'SQL';
+  filename: string;
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  totalRecords: number;
+  processedRecords: number;
+  errorRecords: number;
+  errors: unknown[] | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  createdAt: string;
+}
+
+export async function uploadLegacyFile(
+  file: File,
+  type: 'CSV' | 'SQL',
+  mapping?: Record<string, string>,
+): Promise<LegacyImportDTO> {
+  const form = new FormData();
+  form.append('file', file);
+  form.append('type', type);
+  if (mapping) form.append('mapping', JSON.stringify(mapping));
+  const res = await api.post<LegacyImportDTO>('/legacy/import', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data;
+}
+
+export async function listLegacyImports(params: { page?: number; pageSize?: number }) {
+  const res = await api.get<PageResult<LegacyImportDTO>>('/legacy/imports', { params });
+  return res.data;
+}
+
+export async function getLegacyImportStatus(id: string): Promise<LegacyImportDTO> {
+  const res = await api.get<LegacyImportDTO>(`/legacy/imports/${id}`);
+  return res.data;
+}
+
+export function useLegacyImports(params: { page?: number; pageSize?: number }) {
+  return useQuery({
+    queryKey: ['legacy-imports', params],
+    queryFn: () => listLegacyImports(params),
+    placeholderData: (prev) => prev,
+  });
+}

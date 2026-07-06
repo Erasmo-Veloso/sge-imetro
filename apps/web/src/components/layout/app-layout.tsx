@@ -8,6 +8,7 @@ import {
   ClipboardList,
   FileCheck,
   FileText,
+  Upload,
   type LucideIcon,
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -51,6 +52,7 @@ const NAV: NavItem[] = [
   { label: 'Presença', to: '/attendance', icon: ClipboardList, roles: ['TEACHER', 'STUDENT'] },
   { label: 'Pagamentos', to: '/payments', icon: FileText, roles: ['STUDENT', 'ADMIN'] },
   { label: 'Documentos', to: '/audit-documents', icon: FileText, roles: ['STUDENT', 'ADMIN'] },
+  { label: 'Legacy', to: '/legacy', icon: Upload, roles: ['ADMIN'] },
 ];
 
 const ROLE_LABELS: Record<string, string> = {
