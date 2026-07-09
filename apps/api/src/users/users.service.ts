@@ -64,7 +64,7 @@ export class UsersService {
     ]);
 
     return {
-      items: items.map((u) => this.publicUser(u)),
+      items: items.map((u: (typeof items)[0]) => this.publicUser(u)),
       total,
       page,
       pageSize,

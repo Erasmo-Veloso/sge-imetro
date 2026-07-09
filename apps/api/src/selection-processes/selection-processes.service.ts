@@ -64,7 +64,7 @@ export class SelectionProcessesService {
       this.prisma.selectionProcess.count({ where }),
     ]);
     return {
-      items: items.map((s) => ({
+      items: items.map((s: (typeof items)[0]) => ({
         ...s,
         enrolledCount: s._count.enrollments,
         _count: undefined,

@@ -94,7 +94,7 @@ export class GradesService {
     let totalWeight = 0;
 
     for (const grade of grades) {
-      const item = plan.items.find((i) => i.id === grade.assessmentItemId);
+      const item = plan.items.find((i: { id: string }) => i.id === grade.assessmentItemId);
       if (item) {
         const normalizedScore = (grade.score / item.maxScore) * plan.scaleMax;
         weightedSum += normalizedScore * (item.weight / 100);
