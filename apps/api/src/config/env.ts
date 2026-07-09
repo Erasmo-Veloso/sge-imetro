@@ -13,7 +13,7 @@ export const envSchema = z.object({
   STORAGE_DRIVER: z.enum(['local', 's3']).default('local'),
   STORAGE_LOCAL_DIR: z.string().default('./storage'),
   RESEND_API_KEY: z.string().optional(),
-  MAIL_FROM: z.string().email().default('no-reply@sge.local'),
+  MAIL_FROM: z.string().email().default('no-reply@imetro.ao'),
   BCRYPT_ROUNDS: z.coerce.number().int().min(10).max(15).default(12),
   QR_TOKEN_TTL_SECONDS: z.coerce.number().int().positive().default(600),
 });

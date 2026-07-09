@@ -12,7 +12,7 @@ import { customAlphabet } from 'nanoid';
 import * as QRCode from 'qrcode';
 
 const generateToken = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789', 32);
-const QR_TTL_MS = 10 * 60 * 1000;
+const QR_TTL_MS = 60 * 60 * 1000;
 
 @Injectable()
 export class AttendanceService {

@@ -16,7 +16,7 @@ export class ResendMailGateway implements IMailGateway {
   async send(message: MailMessage): Promise<{ id?: string }> {
     const recipients = Array.isArray(message.to) ? message.to : [message.to];
     const { data, error } = await this.client.emails.send({
-      from: process.env.MAIL_FROM ?? 'no-reply@sge.local',
+      from: process.env.MAIL_FROM ?? 'no-reply@imetro.ao',
       to: recipients.map((r) => (r.name ? `${r.name} <${r.email}>` : r.email)),
       subject: message.subject,
       html: message.html,

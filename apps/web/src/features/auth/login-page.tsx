@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 export function LoginPage() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('admin@sge.local');
+  const [email, setEmail] = useState('admin@imetro.ao');
   const [password, setPassword] = useState('Password123!');
   const [loading, setLoading] = useState(false);
 
@@ -31,11 +31,13 @@ export function LoginPage() {
     <div className="bg-muted/30 flex min-h-svh items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="bg-primary text-primary-foreground mx-auto mb-3 flex size-12 items-center justify-center rounded-xl font-bold">
-            SGE
+          <div className="bg-primary text-primary-foreground mx-auto mb-3 flex size-12 items-center justify-center rounded-xl text-sm font-bold">
+            IM
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Aceder à plataforma</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Sistema de Gestão Educacional</p>
+          <h1 className="text-2xl font-bold tracking-tight">IMETRO</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Instituto Superior Metropolitano de Angola
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-card space-y-4 rounded-lg border p-6 shadow-sm">
@@ -76,7 +78,7 @@ export function LoginPage() {
           </Button>
 
           <p className="text-muted-foreground text-center text-xs">
-            Demo: admin@/teacher@/student@sge.local · Password123!
+            Demo: admin@/teacher@/student@imetro.ao · Password123!
           </p>
         </form>
       </div>

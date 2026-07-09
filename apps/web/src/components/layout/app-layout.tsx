@@ -77,9 +77,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <aside className="bg-card flex w-60 flex-col border-r">
         <div className="flex h-16 items-center gap-2 border-b px-5">
           <div className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-lg text-xs font-bold">
-            SGE
+            IM
           </div>
-          <span className="font-semibold">SGE</span>
+          <span className="font-semibold">IMETRO</span>
         </div>
 
         <nav className="flex-1 space-y-1 p-3">

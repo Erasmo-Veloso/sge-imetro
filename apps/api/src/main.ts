@@ -33,7 +33,7 @@ async function bootstrap() {
   );
 
   await app.listen(port);
-  logger.log(`🚀 SGE API running on http://localhost:${port}/api`);
+  logger.log(`🚀 IMETRO API running on http://localhost:${port}/api`);
   logger.log(`CORS origins: ${corsOrigins.join(', ')}`);
 }
 

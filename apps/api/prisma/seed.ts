@@ -3,15 +3,17 @@ import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
+const DOMAIN = 'imetro.ao';
+
 async function main(): Promise<void> {
   const passwordHash = await bcrypt.hash('Password123!', 12);
 
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@sge.local' },
+    where: { email: `admin@${DOMAIN}` },
     update: {},
     create: {
-      name: 'Administrador',
-      email: 'admin@sge.local',
+      name: 'Administrador IMETRO',
+      email: `admin@${DOMAIN}`,
       passwordHash,
       role: UserRole.ADMIN,
       status: UserStatus.ACTIVE,
@@ -19,11 +21,11 @@ async function main(): Promise<void> {
   });
 
   const teacher = await prisma.user.upsert({
-    where: { email: 'teacher@sge.local' },
+    where: { email: `teacher@${DOMAIN}` },
     update: {},
     create: {
-      name: 'Docente Exemplo',
-      email: 'teacher@sge.local',
+      name: 'Professor Manuel dos Santos',
+      email: `teacher@${DOMAIN}`,
       passwordHash,
       role: UserRole.TEACHER,
       status: UserStatus.ACTIVE,
@@ -31,11 +33,11 @@ async function main(): Promise<void> {
   });
 
   const student = await prisma.user.upsert({
-    where: { email: 'student@sge.local' },
+    where: { email: `student@${DOMAIN}` },
     update: {},
     create: {
-      name: 'Estudante Exemplo',
-      email: 'student@sge.local',
+      name: 'Ana Tchissola Sebastião',
+      email: `student@${DOMAIN}`,
       passwordHash,
       role: UserRole.STUDENT,
       status: UserStatus.ACTIVE,
@@ -48,7 +50,7 @@ async function main(): Promise<void> {
     create: {
       name: 'Engenharia Informática',
       code: 'ENG-INF',
-      description: 'Curso de Engenharia Informática — exemplo',
+      description: 'Curso de Engenharia Informática — Instituto Superior Metropolitano de Angola',
       durationYears: 3,
       coordinatorId: teacher.id,
       status: 'ACTIVE',
@@ -167,7 +169,7 @@ async function main(): Promise<void> {
     },
   });
 
-  // Pagamento de exemplo (para Sprint 4)
+  // Pagamento de exemplo
   await prisma.payment.create({
     data: {
       userId: student.id,
@@ -180,14 +182,24 @@ async function main(): Promise<void> {
   });
 
   // eslint-disable-next-line no-console
-  console.log('✅ Seed completed:');
-  console.log('   Users: admin@/teacher@/student@sge.local (pwd: Password123!)');
-  console.log(`   Course: ${course.name} (${course.code}) with ${disciplines.length} disciplines`);
-  console.log(`   Classes: ${classes.length} (2026/1º semestre)`);
-  console.log(`   Assessment plan: ${planItems.length} items (Programação I)`);
-  console.log(`   Grades: ${scores.length} notas de exemplo`);
-  console.log('   Payment: 1 pagamento de exemplo');
+  console.log('✅ Seed concluído — Instituto Superior Metropolitano de Angola');
+  console.log(`   Utilizadores: admin@/teacher@/student@${DOMAIN} (senha: Password123!)`);
+  console.log(`   Curso: ${course.name} (${course.code}) — ${disciplines.length} disciplinas`);
+  console.log(`   Turmas: ${classes.length} (2026/1º semestre)`);
+  console.log(`   Plano avaliação: ${planItems.length} itens (Programação I)`);
+  console.log(`   Notas: ${scores.length} notas de exemplo`);
+  console.log('   Pagamento: 1 exemplo');
 }
+
+main()
+  .catch((e) => {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
 
 main()
   .catch((e) => {

@@ -60,7 +60,9 @@ export function CoursesPage() {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Cursos</h1>
-          <p className="text-muted-foreground text-sm">Cursos disponíveis na instituição</p>
+          <p className="text-muted-foreground text-sm">
+            Cursos do Instituto Superior Metropolitano de Angola
+          </p>
         </div>
         <Button
           onClick={() => {
