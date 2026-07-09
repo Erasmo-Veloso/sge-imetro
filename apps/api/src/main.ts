@@ -23,7 +23,7 @@ async function bootstrap() {
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   });
-  app.setGlobalPrefix('api', { exclude: ['health'] });
+  app.setGlobalPrefix('api', { exclude: ['health', '/'] });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
