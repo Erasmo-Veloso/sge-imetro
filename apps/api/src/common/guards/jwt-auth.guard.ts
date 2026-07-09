@@ -6,6 +6,7 @@ import { ROLES_KEY } from '../decorators/roles.decorator';
 
 export interface JwtPayload {
   sub: string;
+  id: string;
   email: string;
   name: string;
   role: 'STUDENT' | 'TEACHER' | 'ADMIN';
@@ -26,7 +27,7 @@ export class JwtAuthGuard implements CanActivate {
 
     try {
       const payload = await this.jwt.verifyAsync<JwtPayload>(token);
-      request.user = payload;
+      request.user = { ...payload, id: payload.sub };
     } catch {
       throw new UnauthorizedException('Token inválido ou expirado');
     }

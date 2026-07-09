@@ -15,27 +15,39 @@ export class GradesService {
     const results: { registrationId: string; assessmentItemId: string; score: number }[] = [];
 
     for (const entry of dto.grades) {
-      const grade = await this.prisma.grade.upsert({
-        where: {
-          registrationId_assessmentItemId: {
+      try {
+        const grade = await this.prisma.grade.upsert({
+          where: {
+            registrationId_assessmentItemId: {
+              registrationId: entry.registrationId,
+              assessmentItemId: entry.assessmentItemId,
+            },
+          },
+          update: {
+            score: entry.score,
+            ...(entry.note !== undefined && { note: entry.note }),
+            recordedById: teacherId,
+          },
+          create: {
             registrationId: entry.registrationId,
             assessmentItemId: entry.assessmentItemId,
+            score: entry.score,
+            ...(entry.note !== undefined && { note: entry.note }),
+            recordedById: teacherId,
           },
-        },
-        update: { score: entry.score, note: entry.note, recordedById: teacherId },
-        create: {
-          registrationId: entry.registrationId,
-          assessmentItemId: entry.assessmentItemId,
-          score: entry.score,
-          note: entry.note,
-          recordedById: teacherId,
-        },
-      });
-      results.push({
-        registrationId: grade.registrationId,
-        assessmentItemId: grade.assessmentItemId,
-        score: grade.score,
-      });
+        });
+        results.push({
+          registrationId: grade.registrationId,
+          assessmentItemId: grade.assessmentItemId,
+          score: grade.score,
+        });
+      } catch (e) {
+        this.logger.error(
+          `Failed to upsert grade regId=${entry.registrationId} itemId=${entry.assessmentItemId}`,
+          e instanceof Error ? e.stack : e,
+        );
+        throw e;
+      }
     }
 
     this.logger.log(`bulk grades recorded count=${results.length} classId=${classId}`);
