@@ -81,6 +81,17 @@ export function LoginPage() {
             Demo: admin@/teacher@/student@imetro.ao · Password123!
           </p>
         </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-muted-foreground text-xs font-medium">Criadores</p>
+          <p className="text-muted-foreground mt-1 text-xs">
+            Manuela Soares — 20221020
+            <br />
+            Belmira Condo — 20220089
+            <br />
+            Santiago Mulonga — 20200789
+          </p>
+        </div>
       </div>
     </div>
   );
